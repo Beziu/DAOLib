@@ -5,9 +5,8 @@
 #include <QStyledItemDelegate>
 #include <QDate>
 #include <QDateTime>
-#include <QDebug>
 
-// Muss von QStyledItemDelegate abgeleitet werden
+// Musi pochodzić z QStyledItemDelegate
 
 class DateStyledItemDelegate : public QStyledItemDelegate
 {

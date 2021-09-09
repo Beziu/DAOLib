@@ -1,137 +1,142 @@
 #include "DAOLib.h"
 
-// Initialisierung der statischen Variablen
-QSqlDatabase DAOLib::dbConn = QSqlDatabase();
+// Inicjalizacja statycznych zmiennych
+QSqlDatabase DAOLib::dbConnection = QSqlDatabase();
 QString DAOLib::serverName = QString();
 QString DAOLib::dbName = QString();
 
+// Inicjalizacja konstruktora klasy
 DAOLib::DAOLib()
 {
 }
 
+// Laczy z baza danych zwraca true gdy polaczono
 bool DAOLib::connectToDatabase(const QString &driver, 
-						 const QString &driverName, 
-						 const QString &hostName,
-						 const QString &databaseName)
+							   const QString &driverName,
+							   const QString &hostName,
+							   const QString &databaseName)
 {
-    bool isDBOpen = false;
+	bool isDBOpen = false;
 
-    // Tworzy ciąg połączenia
-    // Verbindungszeichenfolge erstellen
-    QString connectionString = driverName + ";";
-    connectionString += "Server=" + hostName + ";";
-    connectionString += "Database=" + databaseName + ";";
+	// Tworzy ciąg połączenia do MSSQL Serwer
+	QString connectionString = driverName + ";";
+	connectionString += "Server=" + hostName + ";";
+	connectionString += "Database=" + databaseName + ";";
 
-    // W przypadku uwierzytelniania systemu Windows
-    // Mit Windows Authentifizierung
-    connectionString += "Trusted_Connection=Yes;";
+	// W przypadku uwierzytelniania systemu Windows
+	connectionString += "Trusted_Connection=Yes;";
 
-    dbConn = QSqlDatabase::addDatabase(driver, databaseName);
+	dbConnection = QSqlDatabase::addDatabase(driver, databaseName);
 
-    // Ciąg połączenia  przypisać
-    // Verbindungszeichenfolge zuweisen
-    dbConn.setDatabaseName(connectionString);
+	// Przypisuje ciag polaczenia
+	dbConnection.setDatabaseName(connectionString);
 
-    // Otwarta baza danych
-    // Datenbank öffnen
-    isDBOpen = dbConn.open();
+	// Sprawdza czy polaczono
+	isDBOpen = dbConnection.open();
 
-    dbName = QString();
-    serverName = QString();
+	dbName = QString();
+	serverName = QString();
 
-    if (!isDBOpen)
-    {
-        QMessageBox::critical(nullptr, "Datenbankfehler",
-                              QString("Fehler beim Öffnen der Datenbank: %1")
-						.arg(dbConn.lastError().text()));
-    }
-    else
-    {
-        dbName = databaseName;
-        serverName = hostName;
-    }
+	if (!isDBOpen)
+	{
+		QMessageBox::critical(nullptr, "Error: Database",
+							  QString("Error opening the database: %1")
+							  .arg(dbConnection.lastError().text()));
+	}
+	else
+	{
+		dbName = databaseName;
+		serverName = hostName;
+	}
 
-    return isDBOpen;
+	return isDBOpen;
+
 }
 
+// Zamyka polaczenie z baza danych
 void DAOLib::closeConnection()
 {
-    dbConn.close();
+	dbConnection.close();
 }
 
+// Zwraca prywatna oraz statyczna zmienna
 QSqlDatabase DAOLib::getDatabaseConnection()
 {
-    return dbConn;
+	return dbConnection;
 }
 
+// Zwraca prywatna oraz statyczna zmienna
 QString DAOLib::getDatabaseName()
 {
-    return dbName;
+	return dbName;
 }
 
+// Zwraca lancuch i zastepuje kazde wystapienie (') w ciagu znakow
+// cudzyslow, podwojnym cudzyslowem ('')
 QString DAOLib::dbString(QString value)
 {
-    // Ująć łańcuch w pojedynczy cudzysłów,
-    // oraz wszelkie cudzysłowy, które mogą wystąpić w obrębie
-    // ciągu znaków z podwójnym cudzysłowem.
-    // Zeichenkette in einfache Anführungszeichen setzen,
-    // und alle evtl. vorkommenden Hochkommas innerhalb
-    // der Zeichenkette durch doppelte Hochkommas ersetzen.
-   return "'" + value.replace("'", "''") + "'";
+    return "'" + value.replace("'", "''") + "'";
 }
 
+// Zwraca date w postaci ciagu znakow, np. 2021-09-03
 QString DAOLib::dbDate(QDate datum)
 {
-   return dbString(datum.toString("yyyy-MM-dd"));
+    return dbString(datum.toString("yyyy-MM-dd"));
 }
 
-
-int DAOLib::executeNonQuery(const QString &SQL)
+// Zwraca liczbe wierszy z pytania do bazy danych
+// W przypadku bledu pytania zwroci wartosc -1
+int DAOLib::executeNonQuery(const QString &sql)
 {
 
     int retValue = -1;
 
-    QSqlQuery query = QSqlQuery(dbConn);
+    QSqlQuery query = QSqlQuery(dbConnection);
 
-    if (!query.exec(SQL))
-        QMessageBox::critical(nullptr, "SQL-Fehler",
-                              QString("Fehler beim Zugriff auf die Datenbank: %1")
-						.arg(query.lastError().text()));
+    if (!query.exec(sql))
+        QMessageBox::critical(nullptr, "Error: SQL",
+                              QString("Error accessing the database: %1")
+                              .arg(query.lastError().text()));
     else
         retValue = query.numRowsAffected();
 
     return retValue;
+
 }
 
-QVariant DAOLib::executeScalar(const QString &SQL, bool &OK)
+// Tworzy Variant danych (jakiegos nieznanego typu) oraz
+// zwraca te dane gdy wystapi blad polaczenia z baza danych
+QVariant DAOLib::executeScalar(const QString &sql, bool &ok)
 {
-    OK = false;
+    ok = false;
     QVariant retValue = 0;
 
-    QSqlQuery query = QSqlQuery(dbConn);
-    bool qryValue = query.exec(SQL);
+    QSqlQuery query = QSqlQuery(dbConnection);
+    bool qryValue = query.exec(sql);
 
     if (!qryValue)
     {
-        QMessageBox::critical(nullptr, "SQL-Fehler",
-                              QString("Fehler beim Zugriff auf die Datenbank: %1")
-						.arg(query.lastError().text()));
+        QMessageBox::critical(nullptr, "Error: SQL",
+                              QString("Error accessing the database: %1")
+                              .arg(query.lastError().text()));
         return retValue;
     }
 
-    // Pozycja w pierwszym zapisie danych w zapytaniu
-    // Auf den ersten Datensatz innerhalb der Query positionieren
+    // Ustawia pozycje na pierwszym zapisie danych
     query.first();
-    OK = true;
+    ok = true;
 
     return query.value(0);
+
 }
 
-QSqlQuery *DAOLib::executeQuery(const QString &SQL, bool &OK)
+// Realizuje zapytanie do bazy danych
+QSqlQuery *DAOLib::executeQuery(const QString &sql, bool &ok)
 {
-    QSqlQuery* query = new QSqlQuery(dbConn);
-    OK = query->exec(SQL);
+    QSqlQuery *query = new QSqlQuery(dbConnection);
+    ok = query->exec(sql);
     return query;
+
 }
 
 

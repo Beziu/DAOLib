@@ -14,32 +14,28 @@ class DAOLIB_EXPORT DAOLib
 {
 public:
     // Logowanie do bazy danych za pomocą uwierzytelniania Windows
-    // Datenbankanmeldung mit Windows-Authentifizierung
-    static bool connectToDatabase(const QString& driver,
-                                  const QString& driverName,
-                                  const QString& hostName,
-                                  const QString& databaseName);
+    static bool connectToDatabase(const QString &driver,
+                                  const QString &driverName,
+                                  const QString &hostName,
+                                  const QString &databaseName);
 
     static void closeConnection();
     static QSqlDatabase getDatabaseConnection();
     static QString getDatabaseName();
-    static QString dbString(QString);
-    static QString dbDate(QDate);
+    static QString dbString(QString value);
+    static QString dbDate(QDate date);
 
-    static int executeNonQuery(const QString& SQL);
-    static QVariant executeScalar(const QString& SQL, bool &OK);
-    static QSqlQuery* executeQuery(const QString& SQL, bool &OK);
+    static int executeNonQuery(const QString &sql);
+    static QVariant executeScalar(const QString &sql, bool &ok);
+    static QSqlQuery *executeQuery(const QString &sql, bool &ok);
 
 private:
 
     // Prywatny konstruktor uniemożliwia utworzenie tej klasy.
-    // Wszystkie metody są statyczne.
-    // Privater Konstruktor
-    // Verhindert das Erstellen dieser Klasse.
-    // Alle Methoden sind statisch.
     DAOLib();
 
-    static QSqlDatabase dbConn;
+    // Wszystkie metody są statyczne.
+    static QSqlDatabase dbConnection;
     static QString serverName;
     static QString dbName;
 

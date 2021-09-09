@@ -8,7 +8,7 @@ DateStyledItemDelegate::DateStyledItemDelegate(QWidget* parent, QString dateForm
 
 QString DateStyledItemDelegate::displayText(const QVariant &value, const QLocale &locale) const
 {
-   // Prüfen, ob der Wert in ein Datum konvertiert werden kann
+   // Sprawdza czy wartosc jest data zdolna do konwersji
    if (value.canConvert<QDate>())
       return locale.toString(value.toDate(), dateFormat);
    else
