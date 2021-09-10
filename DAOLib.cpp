@@ -53,6 +53,46 @@ bool DAOLib::connectToDatabase(const QString &driver,
 
 }
 
+// Do serwera MySQL np. connectToDatabase("QMYSQL", "localhost:3306", "root", "", "baza");
+bool DAOLib::connectToDatabase(const QString &driver,
+							   const QString &hostName,
+							   const QString &userName,
+							   const QString &password,
+							   const QString &databaseName)
+{
+	bool isDBOpen = false;
+
+	// Tworzy ciąg połączenia do MySQL Serwer
+	dbConnection = QSqlDatabase::addDatabase(driver);
+	dbConnection.setHostName(hostName);
+	dbConnection.setUserName(userName);
+	dbConnection.setPassword(password);
+
+	// Przypisuje ciag polaczenia
+	dbConnection.setDatabaseName(databaseName);
+
+	// Sprawdza czy polaczono
+	isDBOpen = dbConnection.open();
+
+	dbName = QString();
+	serverName = QString();
+
+	if (!isDBOpen)
+	{
+		QMessageBox::critical(nullptr, "Error: Database",
+							  QString("Error opening the database: %1")
+							  .arg(dbConnection.lastError().text()));
+	}
+	else
+	{
+		dbName = databaseName;
+		serverName = hostName;
+	}
+
+	return isDBOpen;
+
+}
+
 // Zamyka polaczenie z baza danych
 void DAOLib::closeConnection()
 {

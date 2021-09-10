@@ -1,6 +1,7 @@
 #ifndef DAOLIB_H
 #define DAOLIB_H
 
+#include <QSql>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
@@ -17,6 +18,11 @@ public:
     static bool connectToDatabase(const QString &driver,
                                   const QString &driverName,
                                   const QString &hostName,
+                                  const QString &databaseName);
+    static bool connectToDatabase(const QString &driver,
+                                  const QString &hostName,
+                                  const QString &userName,
+                                  const QString &password,
                                   const QString &databaseName);
 
     static void closeConnection();
