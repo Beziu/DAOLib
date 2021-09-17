@@ -11,21 +11,19 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    AddressBookContact.cpp \
     AddressBookDAO.cpp \
     AddressBookGroup.cpp \
     DAOLib.cpp \
     DateStyledItemDelegate.cpp \
-    Postleitzahl.cpp \
-    PostleitzahlenDAO.cpp
 
 HEADERS += \
+    AddressBookContact.h \
     AddressBookDAO.h \
     AddressBookGroup.h \
     DAOLib_global.h \
     DAOLib.h \
     DateStyledItemDelegate.h \
-    Postleitzahl.h \
-    PostleitzahlenDAO.h
 
 # Default rules for deployment.
 unix {

@@ -89,7 +89,7 @@ bool DAOLib::connectToDatabase(const QString &driver,
 		serverName = hostName;
 	}
 
-	return isDBOpen;
+	return dbConnection.open();
 
 }
 

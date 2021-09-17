@@ -3,6 +3,8 @@
 
 #include <QtCore/qglobal.h>
 
+//#define BUILDING_DLL
+
 #if defined(DAOLIB_LIBRARY)
 #  define DAOLIB_EXPORT Q_DECL_EXPORT
 #else
